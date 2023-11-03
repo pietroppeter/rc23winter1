@@ -17,5 +17,7 @@ lenimgrad
   - no need to use a class
 - [x] add value
   - vs python: more natural operator definition `+` (and no need to attach to class, again)
+- [x] multiply
+  - vs python: showing a walrus like operator we get for free
+- vs python: up to now the most odd thing we have notation wise is oberon's `*` operator for exporting (instead of pub keyboard or everything public and underscore means private convention as in python)
 
-  
