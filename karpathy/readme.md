@@ -21,3 +21,6 @@ lenimgrad
   - vs python: showing a walrus like operator we get for free
 - vs python: up to now the most odd thing we have notation wise is oberon's `*` operator for exporting (instead of pub keyboard or everything public and underscore means private convention as in python)
 
+inspiration: I should have a `nb` command from nimib that when it is run against a nim file it decorates it with outputs
+(if I add also a shortcut from editor it would make a pretty nice DX)
+
