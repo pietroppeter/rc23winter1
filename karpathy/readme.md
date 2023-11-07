@@ -30,6 +30,22 @@ lenimgrad
   - [ ] could use metaprogramming to avoid needing to specify label
 - PAUSE: stopped watching after explaining manual grad (and before the neuron)
 https://youtu.be/VMj-3S1tku0?si=kmf-l2pZsRmplNvw&t=3182
+- continued watching, to implement first:
+  - _backward (i still need to implement grad)
+    - not trivial to understand which type is this!
+  - topolgical sort
+  - backward: apply topological sort to _backward
+    - watch out for bug
+- then there is the clean up and we shoudl implement:
+  - add and mul constant
+    - and we can do it with symmetry! (no need about __rmul__)
+  - exp
+  - division? no power!
+  - neg and sub
+  - check equivalence of gradient of tanh as broken down as exp
+- finally it uses pytorch to do the same
+  - how does it look with kears 3.0 aka core?
+- PAUSE again before building the MLP: https://youtu.be/VMj-3S1tku0?si=gcxxz5kzFPBv18ds&t=6252
 
 
 inspiration: I should have a `nb` command from nimib that when it is run against a nim file it decorates it with outputs
