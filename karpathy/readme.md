@@ -45,7 +45,7 @@ https://youtu.be/VMj-3S1tku0?si=kmf-l2pZsRmplNvw&t=3182
   - check equivalence of gradient of tanh as broken down as exp
 - finally it uses pytorch to do the same
   - how does it look with kears 3.0 aka core?
-- PAUSE again before building the MLP: https://youtu.be/VMj-3S1tku0?si=gcxxz5kzFPBv18ds&t=6252
+- PAUSE again before building the MLP: https://youtu.be/VMj-3S1tku0?si=gcxxz5kzFPBv18ds&t=6252 (watched 50'of content)
 
 
 inspiration: I should have a `nb` command from nimib that when it is run against a nim file it decorates it with outputs
