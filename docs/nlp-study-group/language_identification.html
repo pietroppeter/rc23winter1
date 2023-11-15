@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>nlp-study-group/language_identification.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/atom-one-light.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+
+.nb-output {
+  line-height: 1.15;
+}
+</style>
+  
+</head>
+<body>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>nlp-study-group/language_identification.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/rc23winter1"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27c.68 0 1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="#000"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+<h1>Language Identification</h1>
+<p>An exercise from our first session of NLP Study Group.</p>
+<h2>Dataset</h2>
+<ul>
+<li>Subset of Europarl corpus</li>
+<li>2k sentences for 5 languages: English, Spanish, French, Italian, German.</li>
+</ul>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> std / [sequtils, strutils]
+
+<span class="hljs-keyword">type</span>
+  <span class="hljs-type">Lang</span> = <span class="hljs-keyword">enum</span> de, en, es, fr, it 
+
+<span class="hljs-keyword">proc</span> readSentences(lang: <span class="hljs-type">Lang</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>] =
+  withDir nb.thisDir:
+    toSeq lines <span class="hljs-string">&quot;langid-corpus/sentences.&quot;</span> &amp; $lang &amp; <span class="hljs-string">&quot;.txt&quot;</span>
+
+<span class="hljs-keyword">var</span> corpus: <span class="hljs-built_in">array</span>[<span class="hljs-type">Lang</span>, <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]]
+<span class="hljs-keyword">for</span> lang <span class="hljs-keyword">in</span> <span class="hljs-type">Lang</span>:
+  corpus[lang] = readSentences lang
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Lang: &quot;</span>, lang
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;#sentences&quot;</span>, len corpus[lang]
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;first 5 sentences:&quot;</span>
+  <span class="hljs-keyword">echo</span> corpus[lang][<span class="hljs-number">0</span> .. <span class="hljs-number">5</span>].join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;...&quot;</span>
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;last 5 sentences:&quot;</span>
+  <span class="hljs-keyword">echo</span> corpus[lang][^<span class="hljs-number">5</span> .. ^<span class="hljs-number">1</span>].join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;---&quot;</span></code></pre><pre class="nb-output"><samp>Lang: de
+#sentences2000
+first 5 sentences:
+Wir haben jedoch - auch noch kürzlich - festgestellt, dass Personen, die eine wichtige Rolle auf der europäischen Bühne gespielt haben, wie die ehemaligen Bundeskanzler Kohl und Schmidt, oder noch spielen, sich in ihrer Eigenschaft als Politiker zwar für die europäische Perspektive der Türkei aussprechen, auf Kongressen und in Vorträgen hingegen die Meinung vertreten, die Türkei habe in der Europäischen Union nichts zu suchen.
+Kann die Kommission angeben, welche Maßnahmen sie unternimmt, um die Ausmerzung der Kinderlähmung durch Impfprogramme in den Entwicklungsländern, insbesondere in Afrika, zu unterstützen?
+Betrachten wir die Periode der D-Mark von 1948 bis 1998, so übertreffen die bisherigen Erfolge der EZB in puncto Preisstabilität sogar noch die der D-Mark, die früher der globale Maßstab war.
+Frau Ainardi hat von der zivilisatorischen Tragweite dieser Entscheidung gesprochen.
+Dies galt auch für meine Fraktion.
+die mündliche Anfrage an die Kommission von Jan Marinus Wiersma, Erika Mann, Daniel Caspary, Robert Sturdy, Cristiana Muscardini und Eugenijus Maldeikis im Namen der Sozialdemokratischen Fraktion im Europäischen Parlament, der Fraktion der Europäischen Volkspartei (Christdemokraten) und Europäischer Demokraten und der Fraktion Union für das Europa der Nationen über das Interimshandelsabkommen zwischen der EU und Turkmenistan - B6-0020/2009) und
+...
+last 5 sentences:
+Herr Präsident, Herr Fatuzzo steht hier nicht allein, was gut für ihn ist.
+Die Abstimmung findet morgen um 9.00 Uhr statt.
+Die Verringerung des Fleischverzehrs und die Erhöhung des Anteils pflanzlicher Eiweiße in unserer Ernährung haben sowohl auf die Umwelt als auf die menschliche Gesundheit positive Auswirkungen.
+Die Kommission sollte in ihrem Vorschlag auch darauf achten, daß aus der Sicht der KMU die Unternehmensverbände eine zentrale Rolle spielen.
+Ich halte die Bestätigung für eine Selbstverständlichkeit, daß der Präsident der Europäischen Zentralbank - und grundsätzlich nur er - im Namen der Länder der Euro-Zone, im Namen der Wirtschafts- und Währungsunion, soweit er zuständig ist, an den internationalen Konferenzen teilnimmt.
+---
+Lang: en
+#sentences2000
+first 5 sentences:
+We have to identify success factors and we also have to see how to tailor them to the situation.
+He was fined and had to go through disciplinary action. These two women over here, these two representatives, deserve at least as much.
+   Mr President, I believe that both Jean Monnet and Altiero Spinelli would be very proud of the events of 1 May.
+I welcome the fact that the debate immediately following this one will focus on the situation in the Middle East.
+I am convinced that I can once again count on the support of this House.
+It also suggested developing a legal instrument for cooperation between enforcement authorities.
+...
+last 5 sentences:
+It is time to do a deal.
+With these reservations, we support the report.
+I believe this crack in the regime and the courage of its protesting youth - whom I salute - will eventually bring the whole rotten government down.
+Economics form an important part of EU-India relations.
+ETA has always tried to internationalise the peace process.
+---
+Lang: es
+#sentences2000
+first 5 sentences:
+El enfoque para hallar una solución política a la cuestión kurda ha sido drásticamente restringido.
+Al igual que el ponente, deseo que todas las normas sean lo más uniformes posible en toda la Unión Europea, pero hay que armonizar normas que puedan ser asumidas desde Laponia hasta Andalucía y, a partir de ahí, cada país o cada región podrá poner los listones todo lo alto que quiera.
+Cuando nos reunimos en Ginebra con la señora Arbour, la Alta Comisaria de Derechos Humanos, y cuando nos devolvió la visita en Bruselas, exploramos detalladamente sus propuestas sobre el proceso de revisión universal que se ha acordado ahora, del cual se dice que permitirá un examen más estricto y más objetivo de los datos de todos los países.
+Informe anual del Consejo al Parlamento Europeo sobre los principales aspectos y las opciones fundamentales de la Política Exterior y de Seguridad Común (PESC) en 2009 (
+El Gobierno estonio tiene derecho a tomar esa decisión, y ha servido de pretexto, no, señora Comisaria, como ha dicho usted, para provocar una disputa entre Rusia y Estonia, sino entre Rusia y la UE.
+Apoyamos los esfuerzos del Presidente Uribe para establecer un diálogo encaminado a un acuerdo humanitario.
+...
+last 5 sentences:
+Asunto: Agencia de Derechos Fundamentales de la Unión Europea
+Todos los países de la UE en el Consejo de Seguridad votaron en contra de la postura estadounidense y a favor de la resolución.
+Examinemos el siglo que acabamos de abandonar.
+Señor Presidente, deseo manifestar mi agradecimiento a la Sra. Comisaria por su amplia explicación.
+Zimbabue (votación)
+---
+Lang: fr
+#sentences2000
+first 5 sentences:
+Je suis d'avis que cela va à l'encontre du Traité et du compromis intervenu concernant le siège du Parlement.
+(PL) Monsieur le Président, je tenais tout simplement à déclarer que lors du vote électronique sur le rapport Patrie, j'ai tenté à deux reprises de voter en faveur d'un amendement, mais mon appareil n'a malheureusement pas fonctionné.
+Enfin, j'invite le Conseil européen et les États membres à supprimer les obstacles actuels qui entravent la libre circulation des travailleurs roumains et bulgares.
+La dernière fois, il s'agissait du gouvernement de Mugabe qui luttait contre le MDC.
+En application du même principe d'unification, le rapporteur appelle à la suppression complète des contrôles aux frontières, sans doute pour que les touristes ne s'aperçoivent plus qu'ils sont en train de passer d'un pays à un autre.
+Nous sommes ici pour discuter des priorités de la politique économique, sociale et environnementale qui seront abordées lors du sommet de printemps.
+...
+last 5 sentences:
+Il subsiste encore toutefois des divergences entre les intérêts nationaux et les intérêts européens, raison pour laquelle il est suggéré que chaque gouvernement intègre le plan d'action national dans le développement des politiques communes en matière d'emploi.
+Le plan d'action actuel est un peu plus réaliste et pragmatique que le plan proposé initialement.
+Je crois que c'est une notion qui est parfaitement contraire à l'esprit de la politique commune de la pêche.
+Les préoccupations des citoyens européens concernant l’influenza aviaire et l’apparition des premiers cas en Europe ont rendu d’autant plus importante l’adoption, le plus rapidement possible, de cette nouvelle législation actualisée à l’efficacité renforcée.
+Activités de la BERD
+---
+Lang: it
+#sentences2000
+first 5 sentences:
+Inoltre sono d’accordo col relatore quando afferma che il programma dovrebbe essere accessibile a tutti e non concentrarsi solamente sui gruppi più istruiti e privilegiati.
+Tuttavia dal punto di vista morale ci si domanda se questo approccio permetta a rifugiati politici o di altro tipo di accedere alle procedure di asilo.
+Ringrazio il Presidente in carica del Consiglio, António Guterres, e passo subito la parola al Presidente della Commissione, Romano Prodi.
+Signor Presidente, Commissario Rehn, onorevole Pack, onorevoli deputati, desidero iniziare ringraziando moltissimo l'onorevole Pack per la qualità della sua relazione e per le parole che ha appena pronunciato che mi consentiranno di essere più breve su questo tema molto complesso.
+Vorrei ringraziare la commissione giuridica per il sostegno offertomi, oltre che naturalmente la relatrice, onorevole Lefrançois, sottolineando che nello svolgimento di tale compito è stata aperta alla comprensione e al dialogo per la ricerca di un consenso che in tale ambito è assolutamente essenziale.
+Tuttavia, va anche osservato che due terzi dei membri del parlamento mauritano hanno sottoscritto una dichiarazione di sostegno del leader del colpo di Stato e i suoi generali.
+...
+last 5 sentences:
+A un mio ex collega, un ministro che faceva campagna elettorale in una precedente consultazione referendariaè stato detto: “Se non fai togliere quei dal fondo del vicolo, non vado a votare”.
+Per cui, è a dire poco sorprendente non trovare questo indirizzo né nella versione della Commissione, né in quella del Consiglio ECOFIN.
+Spero che egli riesca a sopravvivere alle operazioni.
+9.
+Siamo lieti anche di poter affrontare molti problemi: il dibattito liberale a livello interno è per noi il bene più prezioso.
+---</samp></pre>
+</main>
+<footer>
+<hr>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib
+
+nbInit
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+# Language Identification
+
+An exercise from our first session of NLP Study Group.
+
+## Dataset
+
+- Subset of Europarl corpus
+- 2k sentences for 5 languages: English, Spanish, French, Italian, German.
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> std / [sequtils, strutils]
+
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Lang</span> = <span class="hljs-keyword">enum</span> de, en, es, fr, it 
+
+  <span class="hljs-keyword">proc</span> readSentences(lang: <span class="hljs-type">Lang</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>] =
+    withDir nb.thisDir:
+      toSeq lines <span class="hljs-string">&quot;langid-corpus/sentences.&quot;</span> &amp; $lang &amp; <span class="hljs-string">&quot;.txt&quot;</span>
+
+  <span class="hljs-keyword">var</span> corpus: <span class="hljs-built_in">array</span>[<span class="hljs-type">Lang</span>, <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]]
+  <span class="hljs-keyword">for</span> lang <span class="hljs-keyword">in</span> <span class="hljs-type">Lang</span>:
+    corpus[lang] = readSentences lang
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Lang: &quot;</span>, lang
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;#sentences&quot;</span>, len corpus[lang]
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;first 5 sentences:&quot;</span>
+    <span class="hljs-keyword">echo</span> corpus[lang][<span class="hljs-number">0</span> .. <span class="hljs-number">5</span>].join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;...&quot;</span>
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;last 5 sentences:&quot;</span>
+    <span class="hljs-keyword">echo</span> corpus[lang][^<span class="hljs-number">5</span> .. ^<span class="hljs-number">1</span>].join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;---&quot;</span>
+
+
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>
