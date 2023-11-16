@@ -43,6 +43,9 @@ section#source {
 <hr>
 </header><main>
 <h2>&quot;A Regular Expression Matcher&quot; in Nim</h2>
+<blockquote>
+<p>Work in Progress!</p>
+</blockquote>
 <p>An implementation in Nim of
 the minimal regular expression matcher from
 an article by Brian Kernighan explaining code by Rob Pike.</p>
@@ -142,6 +145,13 @@ literal and wildcard.</p>
 <li>we use overloading, our match function with indices is equivalent to <code>matchhere</code></li>
 <li>strings are not null terminated (and we can iterate over their length)</li>
 </ul>
+<p>Note that:</p>
+<ul>
+<li>it is <strong>11 lines of code</strong> and already useful!</li>
+<li>I left the <code>debugEcho</code> commented since I did have a bug (<code>j &gt; text.len</code> instead of <code>j &lt; text.len</code>)</li>
+<li>need to use <code>debugEcho</code> instead of <code>echo</code> because we are inside a function
+and no side effects are permitted (but <code>debugEcho</code> gets a pass from compiler)</li>
+</ul>
 </main>
 <footer>
 <hr>
@@ -157,6 +167,8 @@ literal and wildcard.</p>
 nbInit
 nbText: <span class="hljs-string">&quot;&quot;&quot;
 ## &quot;A Regular Expression Matcher&quot; in Nim
+
+&gt; Work in Progress!
 
 An implementation in Nim of
 the minimal regular expression matcher from
@@ -243,6 +255,12 @@ Differences with original code:
 - we are not using pointers so we need to keep track of indices `i` and `j`
 - we use overloading, our match function with indices is equivalent to `matchhere`
 - strings are not null terminated (and we can iterate over their length)
+
+Note that:
+- it is **11 lines of code** and already useful!
+- I left the `debugEcho` commented since I did have a bug (`j &gt; text.len` instead of `j &lt; text.len`)
+- need to use `debugEcho` instead of `echo` because we are inside a function
+  and no side effects are permitted (but `debugEcho` gets a pass from compiler)
 &quot;&quot;&quot;</span>
 
 <span class="hljs-comment"># http://norvig.com/ngrams/</span>

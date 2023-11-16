@@ -91,6 +91,12 @@ Differences with original code:
 - we are not using pointers so we need to keep track of indices `i` and `j`
 - we use overloading, our match function with indices is equivalent to `matchhere`
 - strings are not null terminated (and we can iterate over their length)
+
+Note that:
+- it is **11 lines of code** and already useful!
+- I left the `debugEcho` commented since I did have a bug (`j > text.len` instead of `j < text.len`)
+- need to use `debugEcho` instead of `echo` because we are inside a function
+  and no side effects are permitted (but `debugEcho` gets a pass from compiler)
 """
 
 # http://norvig.com/ngrams/
