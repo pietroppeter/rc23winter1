@@ -8,7 +8,9 @@ nbText: """
 
 An implementation in Nim of
 the minimal regular expression matcher from
-an article by Brian Kernighan explaining code by Rob Pike.
+an article by Brian Kernighan explaining code by Rob Pike:
+[A Regular Expression Matcher](https://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html)
+(I suspect it is an excerpt from the book Beatiful Code by Andy Oram and Greg Wilson).
 
 Minimality is due to the fact that only 5 common regular expression features are implemented:
 
@@ -20,8 +22,9 @@ Minimality is due to the fact that only 5 common regular expression features are
 | $ | matches the end of the input string |
 | * | matches zero or more occurrences of the previous character |
 
-The article is available [here](https://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html).
-I suspect it might also part of Beatiful Code book by Andy Oram and Greg Wilson.
+The article is a great read and the implementation is in C.
+Porting to Nim let's me appreciate differences with Nim
+(pointers! null terminated strings!).
 
 Let's start with a bit of type safety.
 None of this code is needed in the original,
