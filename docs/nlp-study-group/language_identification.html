@@ -62,14 +62,14 @@ section#source {
 <span class="hljs-keyword">for</span> lang <span class="hljs-keyword">in</span> <span class="hljs-type">Lang</span>:
   corpus[lang] = readSentences lang
   <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Lang: &quot;</span>, lang
-  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;#sentences&quot;</span>, len corpus[lang]
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;#sentences: &quot;</span>, len corpus[lang]
   <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;first 5 sentences:&quot;</span>
   <span class="hljs-keyword">echo</span> corpus[lang][<span class="hljs-number">0</span> .. <span class="hljs-number">5</span>].join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
   <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;...&quot;</span>
   <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;last 5 sentences:&quot;</span>
   <span class="hljs-keyword">echo</span> corpus[lang][^<span class="hljs-number">5</span> .. ^<span class="hljs-number">1</span>].join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
   <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;---&quot;</span></code></pre><pre class="nb-output"><samp>Lang: de
-#sentences2000
+#sentences: 2000
 first 5 sentences:
 Wir haben jedoch - auch noch kürzlich - festgestellt, dass Personen, die eine wichtige Rolle auf der europäischen Bühne gespielt haben, wie die ehemaligen Bundeskanzler Kohl und Schmidt, oder noch spielen, sich in ihrer Eigenschaft als Politiker zwar für die europäische Perspektive der Türkei aussprechen, auf Kongressen und in Vorträgen hingegen die Meinung vertreten, die Türkei habe in der Europäischen Union nichts zu suchen.
 Kann die Kommission angeben, welche Maßnahmen sie unternimmt, um die Ausmerzung der Kinderlähmung durch Impfprogramme in den Entwicklungsländern, insbesondere in Afrika, zu unterstützen?
@@ -86,7 +86,7 @@ Die Kommission sollte in ihrem Vorschlag auch darauf achten, daß aus der Sicht 
 Ich halte die Bestätigung für eine Selbstverständlichkeit, daß der Präsident der Europäischen Zentralbank - und grundsätzlich nur er - im Namen der Länder der Euro-Zone, im Namen der Wirtschafts- und Währungsunion, soweit er zuständig ist, an den internationalen Konferenzen teilnimmt.
 ---
 Lang: en
-#sentences2000
+#sentences: 2000
 first 5 sentences:
 We have to identify success factors and we also have to see how to tailor them to the situation.
 He was fined and had to go through disciplinary action. These two women over here, these two representatives, deserve at least as much.
@@ -103,7 +103,7 @@ Economics form an important part of EU-India relations.
 ETA has always tried to internationalise the peace process.
 ---
 Lang: es
-#sentences2000
+#sentences: 2000
 first 5 sentences:
 El enfoque para hallar una solución política a la cuestión kurda ha sido drásticamente restringido.
 Al igual que el ponente, deseo que todas las normas sean lo más uniformes posible en toda la Unión Europea, pero hay que armonizar normas que puedan ser asumidas desde Laponia hasta Andalucía y, a partir de ahí, cada país o cada región podrá poner los listones todo lo alto que quiera.
@@ -120,7 +120,7 @@ Señor Presidente, deseo manifestar mi agradecimiento a la Sra. Comisaria por su
 Zimbabue (votación)
 ---
 Lang: fr
-#sentences2000
+#sentences: 2000
 first 5 sentences:
 Je suis d'avis que cela va à l'encontre du Traité et du compromis intervenu concernant le siège du Parlement.
 (PL) Monsieur le Président, je tenais tout simplement à déclarer que lors du vote électronique sur le rapport Patrie, j'ai tenté à deux reprises de voter en faveur d'un amendement, mais mon appareil n'a malheureusement pas fonctionné.
@@ -137,7 +137,7 @@ Les préoccupations des citoyens européens concernant l’influenza aviaire et 
 Activités de la BERD
 ---
 Lang: it
-#sentences2000
+#sentences: 2000
 first 5 sentences:
 Inoltre sono d’accordo col relatore quando afferma che il programma dovrebbe essere accessibile a tutti e non concentrarsi solamente sui gruppi più istruiti e privilegiati.
 Tuttavia dal punto di vista morale ci si domanda se questo approccio permetta a rifugiati politici o di altro tipo di accedere alle procedure di asilo.
@@ -153,6 +153,18 @@ Spero che egli riesca a sopravvivere alle operazioni.
 9.
 Siamo lieti anche di poter affrontare molti problemi: il dibattito liberale a livello interno è per noi il bene più prezioso.
 ---</samp></pre>
+<h2>Modelling strategy</h2>
+<ul>
+<li>philosphy: use the minimal tool for the task</li>
+<li>start with the simplest possible model</li>
+<li>iterate adding slowly complexity and evaluating step by step</li>
+</ul>
+<p>modelling hierarchy:</p>
+<ul>
+<li>random model (baseline)</li>
+<li>single char frequency model (for e, then for every char)</li>
+<li>2-chars frequencies model</li>
+</ul>
 </main>
 <footer>
 <hr>
@@ -190,14 +202,26 @@ nbCode:
   <span class="hljs-keyword">for</span> lang <span class="hljs-keyword">in</span> <span class="hljs-type">Lang</span>:
     corpus[lang] = readSentences lang
     <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Lang: &quot;</span>, lang
-    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;#sentences&quot;</span>, len corpus[lang]
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;#sentences: &quot;</span>, len corpus[lang]
     <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;first 5 sentences:&quot;</span>
     <span class="hljs-keyword">echo</span> corpus[lang][<span class="hljs-number">0</span> .. <span class="hljs-number">5</span>].join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
     <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;...&quot;</span>
     <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;last 5 sentences:&quot;</span>
     <span class="hljs-keyword">echo</span> corpus[lang][^<span class="hljs-number">5</span> .. ^<span class="hljs-number">1</span>].join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
     <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;---&quot;</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+## Modelling strategy
 
+- philosphy: use the minimal tool for the task
+- start with the simplest possible model
+- iterate adding slowly complexity and evaluating step by step
+
+modelling hierarchy:
+- random model (baseline)
+- single char frequency model (for e, then for every char)
+- 2-chars frequencies model
+
+&quot;&quot;&quot;</span>
 
 nbSave</code></pre>
 </section><script>
