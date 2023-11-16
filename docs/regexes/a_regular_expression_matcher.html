@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>regexes/a_regular_expression_matcher.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/atom-one-light.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+
+.nb-output {
+  line-height: 1.15;
+}
+</style>
+  
+</head>
+<body>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>regexes/a_regular_expression_matcher.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/rc23winter1"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27c.68 0 1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="#000"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+<h2>&quot;A Regular Expression Matcher&quot; in Nim</h2>
+<p>An implementation in Nim of
+the minimal regular expression matcher from
+an article by Brian Kernighan explaining code by Rob Pike.</p>
+<p>Minimality is due to the fact that only 5 common regular expression features are implemented:</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c</td>
+<td>matches any literal character c</td>
+</tr>
+<tr>
+<td>.</td>
+<td>matches any single character</td>
+</tr>
+<tr>
+<td>^</td>
+<td>matches the beginning of the input string</td>
+</tr>
+<tr>
+<td>$</td>
+<td>matches the end of the input string</td>
+</tr>
+<tr>
+<td>*</td>
+<td>matches zero or more occurrences of the previous character</td>
+</tr></tbody></table>
+<p>The article is available <a href="https://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html">here</a>.
+I suspect it might also part of Beatiful Code book by Andy Oram and Greg Wilson.</p>
+<p>Let's start with a bit of type safety.
+None of this code is needed in the original,
+but it makes sense in Nim to take advantage of these nice features:</p>
+<ul>
+<li><code>distinct</code> types</li>
+<li>generalized raw string literals</li>
+<li>the special <code>$</code> proc</li>
+</ul>
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span> <span class="hljs-type">RegExp</span> = <span class="hljs-keyword">distinct</span> <span class="hljs-built_in">string</span> <span class="hljs-comment"># I know it is a string, the compiler does not</span>
+
+<span class="hljs-keyword">func</span> re(pattern: <span class="hljs-built_in">string</span>): <span class="hljs-type">RegExp</span> = pattern.<span class="hljs-type">RegExp</span>
+
+<span class="hljs-keyword">func</span> `$`(regexp: <span class="hljs-type">RegExp</span>): <span class="hljs-built_in">string</span> = <span class="hljs-string">&quot;re&quot;</span> &amp; <span class="hljs-string">'&quot;'</span> &amp; regexp.<span class="hljs-built_in">string</span> &amp; <span class="hljs-string">'&quot;'</span>
+
+<span class="hljs-keyword">func</span> <span class="hljs-keyword">high</span>(regexp: <span class="hljs-type">RegExp</span>): <span class="hljs-built_in">int</span> {. borrow .}
+
+ <span class="hljs-comment"># {. borrow .} here does not work, not sure why</span>
+<span class="hljs-keyword">func</span> `[]`(regexp: <span class="hljs-type">RegExp</span>, i: <span class="hljs-built_in">int</span>): <span class="hljs-built_in">char</span> = regexp.<span class="hljs-built_in">string</span>[i]
+
+<span class="hljs-keyword">let</span> r3r2Pattern = <span class="hljs-string">re&quot;r...r..&quot;</span> <span class="hljs-comment"># same as re(r&quot;r...r..&quot;)</span>
+
+<span class="hljs-keyword">echo</span> r3r2Pattern <span class="hljs-comment"># automatically calls `$` proc</span>
+<span class="hljs-keyword">echo</span> r3r2Pattern[<span class="hljs-number">4</span>]</code></pre><pre class="nb-output"><samp>re&quot;r...r..&quot;
+r</samp></pre>
+<p>How many seven letters word there are in English
+that start with rec and have a r in 5th place?</p>
+<p>With the above regular expression, the engine and a list of words in English
+I could find the answer (on the top of my head I can think of two).</p>
+<p>I would also find words that contain such a subword,
+since the regular expression does not contain the anchors <code>^</code> and <code>$</code>.</p>
+<p>Let's start by implementing only the first two features
+needed for the above regular expression:
+literal and wildcard.</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> match(regexp: <span class="hljs-type">RegExp</span>, text: <span class="hljs-built_in">string</span>; i, j: <span class="hljs-built_in">int</span>): <span class="hljs-built_in">bool</span> =
+  <span class="hljs-comment">## true if regexp starting from i matches text starting from j</span>
+  <span class="hljs-comment"># debugEcho &quot;i: &quot;, i, &quot; j: &quot;, j</span>
+  <span class="hljs-keyword">if</span> i &gt; regexp.<span class="hljs-keyword">high</span>:
+    <span class="hljs-comment"># debugEcho &quot;no more regex to match&quot;</span>
+    <span class="hljs-literal">true</span> <span class="hljs-comment"># no more regexp to match</span>
+  <span class="hljs-keyword">elif</span> j &lt; text.len <span class="hljs-keyword">and</span> (regexp[i] == <span class="hljs-string">'.'</span> <span class="hljs-keyword">or</span> regexp[i] == text[j]):
+    <span class="hljs-comment"># there is text available and wildcard or literal match</span>
+    <span class="hljs-comment"># debugEcho &quot;text available and wildcard or literal match&quot;</span>
+    regexp.match(text, i + <span class="hljs-number">1</span>, j + <span class="hljs-number">1</span>) <span class="hljs-comment"># recursive!</span>
+  <span class="hljs-keyword">else</span>:
+    <span class="hljs-literal">false</span>
+
+<span class="hljs-keyword">func</span> match(regexp: <span class="hljs-type">RegExp</span>, text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">bool</span> =
+  <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. text.<span class="hljs-keyword">high</span>:
+    <span class="hljs-keyword">if</span> regexp.match(text, <span class="hljs-number">0</span>, j):
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+  <span class="hljs-comment"># default is false</span>
+
+<span class="hljs-comment"># some tests </span>
+<span class="hljs-keyword">assert</span> <span class="hljs-string">re&quot;.u.&quot;</span>.match <span class="hljs-string">&quot;run&quot;</span>
+<span class="hljs-keyword">assert</span> <span class="hljs-string">re&quot;s.a.&quot;</span>.match <span class="hljs-string">&quot;space&quot;</span>
+<span class="hljs-keyword">assert</span> <span class="hljs-string">re&quot;s.a.&quot;</span>.match <span class="hljs-string">&quot;fiscal&quot;</span>
+<span class="hljs-keyword">assert</span> <span class="hljs-keyword">not</span> <span class="hljs-string">re&quot;s.a.&quot;</span>.match <span class="hljs-string">&quot;sane&quot;</span>
+<span class="hljs-keyword">assert</span> <span class="hljs-string">re&quot;&quot;</span>.match <span class="hljs-string">&quot;anything&quot;</span>
+<span class="hljs-keyword">assert</span> <span class="hljs-keyword">not</span> <span class="hljs-string">re&quot;.&quot;</span>.match <span class="hljs-string">&quot;&quot;</span></code></pre>
+<p>Differences with original code:</p>
+<ul>
+<li>we are not using pointers so we need to keep track of indices <code>i</code> and <code>j</code></li>
+<li>we use overloading, our match function with indices is equivalent to <code>matchhere</code></li>
+<li>strings are not null terminated (and we can iterate over their length)</li>
+</ul>
+</main>
+<footer>
+<hr>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib
+
+nbInit
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+## &quot;A Regular Expression Matcher&quot; in Nim
+
+An implementation in Nim of
+the minimal regular expression matcher from
+an article by Brian Kernighan explaining code by Rob Pike.
+
+Minimality is due to the fact that only 5 common regular expression features are implemented:
+
+| Pattern | Description |
+|---|---|
+| c | matches any literal character c |
+| . | matches any single character |
+| ^ | matches the beginning of the input string |
+| $ | matches the end of the input string |
+| * | matches zero or more occurrences of the previous character |
+
+The article is available [here](https://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html).
+I suspect it might also part of Beatiful Code book by Andy Oram and Greg Wilson.
+
+Let's start with a bit of type safety.
+None of this code is needed in the original,
+but it makes sense in Nim to take advantage of these nice features:
+- `distinct` types
+- generalized raw string literals
+- the special `$` proc
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span> <span class="hljs-type">RegExp</span> = <span class="hljs-keyword">distinct</span> <span class="hljs-built_in">string</span> <span class="hljs-comment"># I know it is a string, the compiler does not</span>
+
+  <span class="hljs-keyword">func</span> re(pattern: <span class="hljs-built_in">string</span>): <span class="hljs-type">RegExp</span> = pattern.<span class="hljs-type">RegExp</span>
+
+  <span class="hljs-keyword">func</span> `$`(regexp: <span class="hljs-type">RegExp</span>): <span class="hljs-built_in">string</span> = <span class="hljs-string">&quot;re&quot;</span> &amp; <span class="hljs-string">'&quot;'</span> &amp; regexp.<span class="hljs-built_in">string</span> &amp; <span class="hljs-string">'&quot;'</span>
+
+  <span class="hljs-keyword">func</span> <span class="hljs-keyword">high</span>(regexp: <span class="hljs-type">RegExp</span>): <span class="hljs-built_in">int</span> {. borrow .}
+
+   <span class="hljs-comment"># {. borrow .} here does not work, not sure why</span>
+  <span class="hljs-keyword">func</span> `[]`(regexp: <span class="hljs-type">RegExp</span>, i: <span class="hljs-built_in">int</span>): <span class="hljs-built_in">char</span> = regexp.<span class="hljs-built_in">string</span>[i]
+
+  <span class="hljs-keyword">let</span> r3r2Pattern = <span class="hljs-string">re&quot;r...r..&quot;</span> <span class="hljs-comment"># same as re(r&quot;r...r..&quot;)</span>
+
+  <span class="hljs-keyword">echo</span> r3r2Pattern <span class="hljs-comment"># automatically calls `$` proc</span>
+  <span class="hljs-keyword">echo</span> r3r2Pattern[<span class="hljs-number">4</span>]
+nbText: <span class="hljs-string">&quot;&quot;&quot;How many seven letters word there are in English
+that start with rec and have a r in 5th place?
+
+With the above regular expression, the engine and a list of words in English
+I could find the answer (on the top of my head I can think of two).
+
+I would also find words that contain such a subword,
+since the regular expression does not contain the anchors `^` and `$`.
+
+Let's start by implementing only the first two features
+needed for the above regular expression:
+literal and wildcard.
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> match(regexp: <span class="hljs-type">RegExp</span>, text: <span class="hljs-built_in">string</span>; i, j: <span class="hljs-built_in">int</span>): <span class="hljs-built_in">bool</span> =
+    <span class="hljs-comment">## true if regexp starting from i matches text starting from j</span>
+    <span class="hljs-comment"># debugEcho &quot;i: &quot;, i, &quot; j: &quot;, j</span>
+    <span class="hljs-keyword">if</span> i &gt; regexp.<span class="hljs-keyword">high</span>:
+      <span class="hljs-comment"># debugEcho &quot;no more regex to match&quot;</span>
+      <span class="hljs-literal">true</span> <span class="hljs-comment"># no more regexp to match</span>
+    <span class="hljs-keyword">elif</span> j &lt; text.len <span class="hljs-keyword">and</span> (regexp[i] == <span class="hljs-string">'.'</span> <span class="hljs-keyword">or</span> regexp[i] == text[j]):
+      <span class="hljs-comment"># there is text available and wildcard or literal match</span>
+      <span class="hljs-comment"># debugEcho &quot;text available and wildcard or literal match&quot;</span>
+      regexp.match(text, i + <span class="hljs-number">1</span>, j + <span class="hljs-number">1</span>) <span class="hljs-comment"># recursive!</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-literal">false</span>
+
+  <span class="hljs-keyword">func</span> match(regexp: <span class="hljs-type">RegExp</span>, text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">bool</span> =
+    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. text.<span class="hljs-keyword">high</span>:
+      <span class="hljs-keyword">if</span> regexp.match(text, <span class="hljs-number">0</span>, j):
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+    <span class="hljs-comment"># default is false</span>
+
+  <span class="hljs-comment"># some tests </span>
+  <span class="hljs-keyword">assert</span> <span class="hljs-string">re&quot;.u.&quot;</span>.match <span class="hljs-string">&quot;run&quot;</span>
+  <span class="hljs-keyword">assert</span> <span class="hljs-string">re&quot;s.a.&quot;</span>.match <span class="hljs-string">&quot;space&quot;</span>
+  <span class="hljs-keyword">assert</span> <span class="hljs-string">re&quot;s.a.&quot;</span>.match <span class="hljs-string">&quot;fiscal&quot;</span>
+  <span class="hljs-keyword">assert</span> <span class="hljs-keyword">not</span> <span class="hljs-string">re&quot;s.a.&quot;</span>.match <span class="hljs-string">&quot;sane&quot;</span>
+  <span class="hljs-keyword">assert</span> <span class="hljs-string">re&quot;&quot;</span>.match <span class="hljs-string">&quot;anything&quot;</span>
+  <span class="hljs-keyword">assert</span> <span class="hljs-keyword">not</span> <span class="hljs-string">re&quot;.&quot;</span>.match <span class="hljs-string">&quot;&quot;</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Differences with original code:
+- we are not using pointers so we need to keep track of indices `i` and `j`
+- we use overloading, our match function with indices is equivalent to `matchhere`
+- strings are not null terminated (and we can iterate over their length)
+&quot;&quot;&quot;</span>
+
+<span class="hljs-comment"># http://norvig.com/ngrams/</span>
+
+<span class="hljs-comment">#[
+  func match(regexp: RegExp, text: string, i: int): bool =
+    discard
+
+  func match(regexp: RegExp, text: string): bool =
+    var i == 0
+    if regexp[0] == '^':
+      return match(regexp, text, i)
+    else:
+      for i 
+
+]#</span>
+
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>
