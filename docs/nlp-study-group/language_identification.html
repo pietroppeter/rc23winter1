@@ -165,6 +165,99 @@ Siamo lieti anche di poter affrontare molti problemi: il dibattito liberale a li
 <li>single char frequency model (for e, then for every char)</li>
 <li>2-chars frequencies model</li>
 </ul>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> std / tables
+
+<span class="hljs-keyword">const</span> maxLenGram = <span class="hljs-number">3</span>
+
+<span class="hljs-keyword">type</span>
+  <span class="hljs-type">LangNgramModel</span> = <span class="hljs-keyword">object</span>
+    ngrams: <span class="hljs-built_in">array</span>[<span class="hljs-number">1</span> .. maxLenGram, <span class="hljs-type">CountTable</span>[<span class="hljs-built_in">string</span>]]
+    byLang: <span class="hljs-built_in">array</span>[<span class="hljs-type">Lang</span>, <span class="hljs-type">CountTable</span>[<span class="hljs-built_in">string</span>]]
+  <span class="hljs-type">LangDataset</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-keyword">tuple</span>[sentence: <span class="hljs-built_in">string</span> ,lang: <span class="hljs-type">Lang</span>]]
+
+<span class="hljs-keyword">proc</span> fit(model: <span class="hljs-keyword">var</span> <span class="hljs-type">LangNgramModel</span>, dataset: <span class="hljs-type">LangDataset</span>) =
+  <span class="hljs-keyword">for</span> lenGram <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. maxLenGram:
+    <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> dataset:
+      <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. (row.sentence.len - lenGram):
+        <span class="hljs-keyword">let</span> ngram = row.sentence[i ..&lt; i + lenGram]
+        model.ngrams[lenGram].inc ngram
+        model.byLang[row.lang].inc ngram
+
+<span class="hljs-keyword">var</span> model = <span class="hljs-type">LangNgramModel</span>()
+<span class="hljs-keyword">let</span> helloDataset = @[
+  (<span class="hljs-string">&quot;hallo&quot;</span>, de),
+  (<span class="hljs-string">&quot;hello&quot;</span>, en),
+  (<span class="hljs-string">&quot;hola&quot;</span>, es),
+  (<span class="hljs-string">&quot;salut&quot;</span>, fr),
+  (<span class="hljs-string">&quot;ciao&quot;</span>, it),
+]
+model.fit helloDataset
+
+<span class="hljs-keyword">func</span> `$`(model: <span class="hljs-type">LangNgramModel</span>): <span class="hljs-built_in">string</span> =
+  <span class="hljs-keyword">for</span> lenGram <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. maxLenGram:
+    <span class="hljs-literal">result</span>.add $lenGram &amp; <span class="hljs-string">&quot;-grams:</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+    <span class="hljs-keyword">var</span> tot: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">var</span> totByLang: <span class="hljs-built_in">array</span>[<span class="hljs-type">Lang</span>, <span class="hljs-built_in">int</span>]
+    <span class="hljs-keyword">for</span> ngram, count <span class="hljs-keyword">in</span> model.ngrams[lenGram]:
+      <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;  &quot;</span> &amp; ngram &amp; <span class="hljs-string">&quot;: &quot;</span> &amp; $count &amp; <span class="hljs-string">&quot; | &quot;</span>
+      tot += count
+      <span class="hljs-keyword">for</span> lang <span class="hljs-keyword">in</span> <span class="hljs-type">Lang</span>:
+        <span class="hljs-keyword">let</span> langCount = model.byLang[lang][ngram]
+        <span class="hljs-literal">result</span>.add $lang &amp; <span class="hljs-string">&quot; &quot;</span> &amp; $langCount &amp; <span class="hljs-string">&quot; | &quot;</span>
+        totByLang[lang] += langCount
+      <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+    <span class="hljs-literal">result</span>.add $tot &amp; <span class="hljs-string">&quot; | &quot;</span>
+    <span class="hljs-keyword">for</span> lang <span class="hljs-keyword">in</span> <span class="hljs-type">Lang</span>:
+      <span class="hljs-literal">result</span>.add $lang &amp; <span class="hljs-string">&quot; &quot;</span> &amp; $totByLang[lang] &amp; <span class="hljs-string">&quot; | &quot;</span>
+    <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+    <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;---</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+
+<span class="hljs-keyword">echo</span> model</code></pre><pre class="nb-output"><samp>1-grams:
+  t: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  h: 3 | de 1 | en 1 | es 1 | fr 0 | it 0 | 
+  c: 1 | de 0 | en 0 | es 0 | fr 0 | it 1 | 
+  u: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  e: 1 | de 0 | en 1 | es 0 | fr 0 | it 0 | 
+  i: 1 | de 0 | en 0 | es 0 | fr 0 | it 1 | 
+  l: 6 | de 2 | en 2 | es 1 | fr 1 | it 0 | 
+  s: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  a: 4 | de 1 | en 0 | es 1 | fr 1 | it 1 | 
+  o: 4 | de 1 | en 1 | es 1 | fr 0 | it 1 | 
+23 | de 5 | en 5 | es 4 | fr 5 | it 4 | 
+---
+2-grams:
+  sa: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  he: 1 | de 0 | en 1 | es 0 | fr 0 | it 0 | 
+  al: 2 | de 1 | en 0 | es 0 | fr 1 | it 0 | 
+  ho: 1 | de 0 | en 0 | es 1 | fr 0 | it 0 | 
+  ha: 1 | de 1 | en 0 | es 0 | fr 0 | it 0 | 
+  ia: 1 | de 0 | en 0 | es 0 | fr 0 | it 1 | 
+  ci: 1 | de 0 | en 0 | es 0 | fr 0 | it 1 | 
+  lu: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  ao: 1 | de 0 | en 0 | es 0 | fr 0 | it 1 | 
+  ol: 1 | de 0 | en 0 | es 1 | fr 0 | it 0 | 
+  ll: 2 | de 1 | en 1 | es 0 | fr 0 | it 0 | 
+  ut: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  el: 1 | de 0 | en 1 | es 0 | fr 0 | it 0 | 
+  la: 1 | de 0 | en 0 | es 1 | fr 0 | it 0 | 
+  lo: 2 | de 1 | en 1 | es 0 | fr 0 | it 0 | 
+18 | de 4 | en 4 | es 3 | fr 4 | it 3 | 
+---
+3-grams:
+  lut: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  hel: 1 | de 0 | en 1 | es 0 | fr 0 | it 0 | 
+  all: 1 | de 1 | en 0 | es 0 | fr 0 | it 0 | 
+  iao: 1 | de 0 | en 0 | es 0 | fr 0 | it 1 | 
+  hol: 1 | de 0 | en 0 | es 1 | fr 0 | it 0 | 
+  llo: 2 | de 1 | en 1 | es 0 | fr 0 | it 0 | 
+  ola: 1 | de 0 | en 0 | es 1 | fr 0 | it 0 | 
+  ell: 1 | de 0 | en 1 | es 0 | fr 0 | it 0 | 
+  cia: 1 | de 0 | en 0 | es 0 | fr 0 | it 1 | 
+  alu: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  sal: 1 | de 0 | en 0 | es 0 | fr 1 | it 0 | 
+  hal: 1 | de 1 | en 0 | es 0 | fr 0 | it 0 | 
+13 | de 3 | en 3 | es 2 | fr 3 | it 2 | 
+---</samp></pre>
 </main>
 <footer>
 <hr>
@@ -175,7 +268,7 @@ Siamo lieti anche di poter affrontare molti problemi: il dibattito liberale a li
 </div>
 </footer>
 <section id="source">
-<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, print
 
 nbInit
 nbText: <span class="hljs-string">&quot;&quot;&quot;
@@ -222,6 +315,55 @@ modelling hierarchy:
 - 2-chars frequencies model
 
 &quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> std / tables
+
+  <span class="hljs-keyword">const</span> maxLenGram = <span class="hljs-number">3</span>
+
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">LangNgramModel</span> = <span class="hljs-keyword">object</span>
+      ngrams: <span class="hljs-built_in">array</span>[<span class="hljs-number">1</span> .. maxLenGram, <span class="hljs-type">CountTable</span>[<span class="hljs-built_in">string</span>]]
+      byLang: <span class="hljs-built_in">array</span>[<span class="hljs-type">Lang</span>, <span class="hljs-type">CountTable</span>[<span class="hljs-built_in">string</span>]]
+    <span class="hljs-type">LangDataset</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-keyword">tuple</span>[sentence: <span class="hljs-built_in">string</span> ,lang: <span class="hljs-type">Lang</span>]]
+
+  <span class="hljs-keyword">proc</span> fit(model: <span class="hljs-keyword">var</span> <span class="hljs-type">LangNgramModel</span>, dataset: <span class="hljs-type">LangDataset</span>) =
+    <span class="hljs-keyword">for</span> lenGram <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. maxLenGram:
+      <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> dataset:
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. (row.sentence.len - lenGram):
+          <span class="hljs-keyword">let</span> ngram = row.sentence[i ..&lt; i + lenGram]
+          model.ngrams[lenGram].inc ngram
+          model.byLang[row.lang].inc ngram
+
+  <span class="hljs-keyword">var</span> model = <span class="hljs-type">LangNgramModel</span>()
+  <span class="hljs-keyword">let</span> helloDataset = @[
+    (<span class="hljs-string">&quot;hallo&quot;</span>, de),
+    (<span class="hljs-string">&quot;hello&quot;</span>, en),
+    (<span class="hljs-string">&quot;hola&quot;</span>, es),
+    (<span class="hljs-string">&quot;salut&quot;</span>, fr),
+    (<span class="hljs-string">&quot;ciao&quot;</span>, it),
+  ]
+  model.fit helloDataset
+
+  <span class="hljs-keyword">func</span> `$`(model: <span class="hljs-type">LangNgramModel</span>): <span class="hljs-built_in">string</span> =
+    <span class="hljs-keyword">for</span> lenGram <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. maxLenGram:
+      <span class="hljs-literal">result</span>.add $lenGram &amp; <span class="hljs-string">&quot;-grams:</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+      <span class="hljs-keyword">var</span> tot: <span class="hljs-built_in">int</span>
+      <span class="hljs-keyword">var</span> totByLang: <span class="hljs-built_in">array</span>[<span class="hljs-type">Lang</span>, <span class="hljs-built_in">int</span>]
+      <span class="hljs-keyword">for</span> ngram, count <span class="hljs-keyword">in</span> model.ngrams[lenGram]:
+        <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;  &quot;</span> &amp; ngram &amp; <span class="hljs-string">&quot;: &quot;</span> &amp; $count &amp; <span class="hljs-string">&quot; | &quot;</span>
+        tot += count
+        <span class="hljs-keyword">for</span> lang <span class="hljs-keyword">in</span> <span class="hljs-type">Lang</span>:
+          <span class="hljs-keyword">let</span> langCount = model.byLang[lang][ngram]
+          <span class="hljs-literal">result</span>.add $lang &amp; <span class="hljs-string">&quot; &quot;</span> &amp; $langCount &amp; <span class="hljs-string">&quot; | &quot;</span>
+          totByLang[lang] += langCount
+        <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+      <span class="hljs-literal">result</span>.add $tot &amp; <span class="hljs-string">&quot; | &quot;</span>
+      <span class="hljs-keyword">for</span> lang <span class="hljs-keyword">in</span> <span class="hljs-type">Lang</span>:
+        <span class="hljs-literal">result</span>.add $lang &amp; <span class="hljs-string">&quot; &quot;</span> &amp; $totByLang[lang] &amp; <span class="hljs-string">&quot; | &quot;</span>
+      <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+      <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;---</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+
+  <span class="hljs-keyword">echo</span> model
 
 nbSave</code></pre>
 </section><script>

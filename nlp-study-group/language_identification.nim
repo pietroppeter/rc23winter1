@@ -1,4 +1,4 @@
-import nimib
+import nimib, print
 
 nbInit
 nbText: """
@@ -45,5 +45,54 @@ modelling hierarchy:
 - 2-chars frequencies model
 
 """
+nbCode:
+  import std / tables
+
+  const maxLenGram = 3
+
+  type
+    LangNgramModel = object
+      ngrams: array[1 .. maxLenGram, CountTable[string]]
+      byLang: array[Lang, CountTable[string]]
+    LangDataset = seq[tuple[sentence: string ,lang: Lang]]
+
+  proc fit(model: var LangNgramModel, dataset: LangDataset) =
+    for lenGram in 1 .. maxLenGram:
+      for row in dataset:
+        for i in 0 .. (row.sentence.len - lenGram):
+          let ngram = row.sentence[i ..< i + lenGram]
+          model.ngrams[lenGram].inc ngram
+          model.byLang[row.lang].inc ngram
+
+  var model = LangNgramModel()
+  let helloDataset = @[
+    ("hallo", de),
+    ("hello", en),
+    ("hola", es),
+    ("salut", fr),
+    ("ciao", it),
+  ]
+  model.fit helloDataset
+
+  func `$`(model: LangNgramModel): string =
+    for lenGram in 1 .. maxLenGram:
+      result.add $lenGram & "-grams:\n"
+      var tot: int
+      var totByLang: array[Lang, int]
+      for ngram, count in model.ngrams[lenGram]:
+        result.add "  " & ngram & ": " & $count & " | "
+        tot += count
+        for lang in Lang:
+          let langCount = model.byLang[lang][ngram]
+          result.add $lang & " " & $langCount & " | "
+          totByLang[lang] += langCount
+        result.add "\n"
+      result.add $tot & " | "
+      for lang in Lang:
+        result.add $lang & " " & $totByLang[lang] & " | "
+      result.add "\n"
+      result.add "---\n"
+
+  echo model
 
 nbSave
