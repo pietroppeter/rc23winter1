@@ -33,10 +33,18 @@ The package gleeunit requires a Gleam version satisfying >= 0.33.0 but you are u
 
 ### 1.3 copy and paste example code
 
-- new issue, mist does not have `run_service` value
+- new issue, mist does not have `run_service` value (anymore)
 - by poking around in the code, I see there are commits that fix glisten warnings and probably also mist ones
 - still have to understand where run_service has disappeared
 - ok disappeared in 0.13.0, last seen in 0.12.0
+
+### 1.4 let's try to copy and paste more recent usage code from mist
+
+- copying and pasting from most recent mist's readme, new issue
+```
+The module `mist` does not have a `Connection` value.
+```
+- this is bizarre since I can see the Connection type in mist source code (even checking the version I should have): https://github.com/rawhat/mist/blob/v0.15.0/src/mist.gleam#L35
 
 ## Appendix A: shell outputs
 
