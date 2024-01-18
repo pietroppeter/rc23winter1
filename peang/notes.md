@@ -6,6 +6,10 @@ decide on first step
 
 - first to unblock, follow hello gleam on fly: https://gleam.run/deployment/fly/
 
+refs (adding them here):
+- https://github.com/rawhat/glisten
+- https://github.com/rawhat/mist
+
 ## step 1
 
 ### 1.1 first issue: old gleam!
@@ -30,7 +34,9 @@ The package gleeunit requires a Gleam version satisfying >= 0.33.0 but you are u
 ### 1.3 copy and paste example code
 
 - new issue, mist does not have `run_service` value
-
+- by poking around in the code, I see there are commits that fix glisten warnings and probably also mist ones
+- still have to understand where run_service has disappeared
+- ok disappeared in 0.13.0, last seen in 0.12.0
 
 ## Appendix A: shell outputs
 
