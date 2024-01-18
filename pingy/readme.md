@@ -82,3 +82,81 @@ Remote builder fly-builder-sparkling-dew-8573 ready
 Error: failed to fetch an image or build from source: error building: failed to solve: executor failed running [/bin/sh -c nimble c -d:release server]: exit code: 1
 
 ```
+- running `nimble init`
+- adding manually `mummy` as dependency (no `nimble add`)
+- `fly launch` first time
+- `fly deploy` next times
+- is `fly` and `flyctl` the same?
+
+```
+==> Verifying app config
+Validating /Users/pietroppeter/rc/rc23winter1/pingy/fly.toml
+Platform: machines
+✓ Configuration is valid
+--> Verified app config
+==> Building image
+Remote builder fly-builder-sparkling-dew-8573 ready
+Remote builder fly-builder-sparkling-dew-8573 ready
+==> Building image with Docker
+--> docker host: 20.10.12 linux x86_64
+[+] Building 25.7s (9/9) FINISHED                                                      
+ => [internal] load build definition from Dockerfile                              0.8s
+ => => transferring dockerfile: 444B                                              0.7s
+ => [internal] load .dockerignore                                                 0.5s
+ => => transferring context: 2B                                                   0.5s
+ => [internal] load metadata for docker.io/nimlang/nim:latest                     1.6s
+ => [internal] load build context                                                 0.6s
+ => => transferring context: 645B                                                 0.6s
+ => [1/4] FROM docker.io/nimlang/nim:latest@sha256:22ca8382c03d339c967c966b7b373  0.0s
+ => CACHED [2/4] WORKDIR /app                                                     0.0s
+ => [3/4] COPY . /app                                                             0.0s
+ => [4/4] RUN nimble c -d:release -y server                                      22.7s
+ => exporting to image                                                            0.0s
+ => => exporting layers                                                           0.0s
+ => => writing image sha256:8454ced8ca2bbf4467db14eba9e2caa3609fa49366aa5b520107  0.0s
+ => => naming to registry.fly.io/pingy-long-moon-805:deployment-01HMET2E3C9QTS65  0.0s
+--> Building image done
+==> Pushing image to fly
+The push refers to repository [registry.fly.io/pingy-long-moon-805]
+74de24a55fab: Pushed 
+50074ced4948: Pushed 
+f3d5036a9fa7: Pushed 
+9ca4766385bc: Pushed 
+c679612a20f3: Pushed 
+49866ef73cc9: Pushed 
+91367454c0b2: Pushed 
+f5bb4f853c84: Pushed 
+deployment-01HMET2E3C9QTS65MFDCNNJ9HA: digest: sha256:8bfe5fb0be9e2c32e5bc382c20ba3478c28897fdb6d3fe8bd3f93b1794a89587 size: 2001
+--> Pushing image done
+image: registry.fly.io/pingy-long-moon-805:deployment-01HMET2E3C9QTS65MFDCNNJ9HA
+image size: 740 MB
+
+Watch your deployment at https://fly.io/apps/pingy-long-moon-805/monitoring
+
+Provisioning ips for pingy-long-moon-805
+  Dedicated ipv6: 2a09:8280:1::4e:e8ce
+  Shared ipv4: 66.241.125.68
+  Add a dedicated ipv4 with: fly ips allocate-v4
+
+This deployment will:
+ * create 2 "app" machines
+
+No machines in group app, launching a new machine
+
+WARNING The app is not listening on the expected address and will not be reachable by fly-proxy.e 9080716a075587 [app] update finished: success
+You can fix this by configuring your app to listen on the following addresses:
+  - 0.0.0.0:8080
+Found these processes inside the machine with open listening sockets:
+  PROCESS        | ADDRESSES                              
+-----------------*----------------------------------------
+  /app/server    | 127.0.0.1:8080                         
+  /.fly/hallpass | [fdaa:5:749b:a7b:d5a6:b363:5b97:2]:22  
+
+Creating a second machine to increase service availability
+
+-------
+ ✖ Failed: error creating a new machine: failed to launch VM: To create more than 1 …
+-------
+Error: error creating a new machine: failed to launch VM: To create more than 1 machine per app please add a payment method. https://fly.io/dashboard/pietro-peterlongo/billing (Request ID: 01HMET8AE7R76MFD6CQT337CHZ-fra)
+```
+this time it seems it worked but I need to set up a payment method (even though I will use free account).

@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Compile the Nim application
-RUN nimble c -d:release server
+RUN nimble c -d:release -y server
 
 # Expose the port your Nim server is listening on
 EXPOSE 8080

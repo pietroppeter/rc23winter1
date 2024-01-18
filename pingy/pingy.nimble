@@ -11,3 +11,4 @@ bin           = @["pingy"]
 # Dependencies
 
 requires "nim >= 1.6.10"
+requires "mummy >= 0.3.7"
