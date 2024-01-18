@@ -160,3 +160,10 @@ Creating a second machine to increase service availability
 Error: error creating a new machine: failed to launch VM: To create more than 1 machine per app please add a payment method. https://fly.io/dashboard/pietro-peterlongo/billing (Request ID: 01HMET8AE7R76MFD6CQT337CHZ-fra)
 ```
 this time it seems it worked but I need to set up a payment method (even though I will use free account).
+- after setting up payment method fly cli does not give error but app does not do what it should (show hello world)
+- locally it runs using same commands as dockerfile
+- will need to debug docker
+- mmh seems to be a docker issue, something I am setting wrong? a port?
+  - did `docker build -t pingy:latest .`
+  - and `docker run -p 8080:8080 pingy`
+  - says `Serving on http://localhost:8080` but nothing is shown
