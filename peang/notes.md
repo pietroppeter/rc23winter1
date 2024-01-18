@@ -29,7 +29,7 @@ The package gleeunit requires a Gleam version satisfying >= 0.33.0 but you are u
 
 ### 1.3 copy and paste example code
 
-
+- new issue, mist does not have `run_service` value
 
 
 ## Appendix A: shell outputs
