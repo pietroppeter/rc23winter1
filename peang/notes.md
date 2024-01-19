@@ -47,6 +47,8 @@ The package gleeunit requires a Gleam version satisfying >= 0.33.0 but you are u
 - still have to understand where run_service has disappeared
 - ok disappeared in 0.13.0, last seen in 0.12.0
 - we are going with wisp
+- created a button inside a form
+- issue: unicode is messed up through string_builder
 
 ### 1.4 let's try to copy and paste more recent usage code from mist
 
