@@ -1,3 +1,12 @@
+## pairing with Elias
+
+- found out we need new `type` keyword
+- release note for the change: https://gleam.run/news/v0.32-polishing-syntax-for-stability/
+- we can suggest to improve error message for that
+
+
+---
+
 impossible stuff day project
 
 ## step 0
