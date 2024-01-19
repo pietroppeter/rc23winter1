@@ -167,3 +167,6 @@ this time it seems it worked but I need to set up a payment method (even though 
   - did `docker build -t pingy:latest .`
   - and `docker run -p 8080:8080 pingy`
   - says `Serving on http://localhost:8080` but nothing is shown
+
+
+  I could clean up readme, tag this version and offer it as a simple example of how to deploy a nim app on fly. (publish on fly forum and nim forum)
