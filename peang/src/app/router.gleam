@@ -1,3 +1,4 @@
+import gleam/http.{Get, Post}
 import wisp.{type Request, type Response}
 import gleam/string_builder
 import app/web
@@ -6,18 +7,33 @@ import app/web
 /// 
 pub fn handle_request(req: Request) -> Response {
   // Apply the middleware stack for this request/response.
-  use _req <- web.middleware(req)
+  use req <- web.middleware(req)
 
   // Later we'll use templates, but for now a string will do.
-  let body =
+
+  case req.method {
+    Get -> show_button()
+    Post -> handle_form_submission(req)
+    _ -> wisp.method_not_allowed(allowed: [Get, Post])
+  }
+  // Return a 200 OK response with the body and a HTML content type.
+}
+
+fn show_button() -> Response {
+  let html =
     string_builder.from_string(
       "
-<form action=\"/ping\">
-  <button>ping 💜</button>
+<form method='post'>
+  <button>ping :purple_heart:</button>
 </form>
 ",
     )
+  wisp.ok()
+  |> wisp.html_body(html)
+}
 
-  // Return a 200 OK response with the body and a HTML content type.
-  wisp.html_response(body, 200)
+fn handle_form_submission(req: Request) -> Response {
+  // not really using formdata at the moment
+  use formdata <- wisp.require_form(req)
+  show_button()
 }

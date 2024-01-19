@@ -49,6 +49,13 @@ The package gleeunit requires a Gleam version satisfying >= 0.33.0 but you are u
 - we are going with wisp
 - created a button inside a form
 - issue: unicode is messed up through string_builder
+  - we will solve this later
+- we were able to make fail the unimplemented (todo) POST request
+- looked into use: https://gleam.run/book/tour/use.html
+  - introduced in Nov 2022: https://gleam.run/news/v0.25-introducing-use-expressions/
+- and equivalent in roc https://www.roc-lang.org/tutorial#backpassing
+  - consider removing: https://docs.google.com/document/d/1mTEZlOKqtMonmVsIGEC1A9ufs1TQHhVgZ52Vn-13GeU/edit
+- handle form in a simple way
 
 ### 1.4 let's try to copy and paste more recent usage code from mist
 
