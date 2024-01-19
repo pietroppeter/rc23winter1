@@ -10,8 +10,5 @@ COPY . /app
 # Compile the Nim application
 RUN nimble c -d:release -y server
 
-# Expose the port your Nim server is listening on
-EXPOSE 8080
-
 # Set the command to run when the container starts
 CMD ["/app/server"]

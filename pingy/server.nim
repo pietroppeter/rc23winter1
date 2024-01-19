@@ -9,5 +9,5 @@ var router: Router
 router.get("/", indexHandler)
 
 let server = newServer(router)
-echo "Serving on http://localhost:8080"
-server.serve(Port(8080))
+echo "Serving on http://0.0.0.0:8080"
+server.serve(Port(8080), address="0.0.0.0")
