@@ -3,8 +3,8 @@
 - found out we need new `type` keyword
 - release note for the change: https://gleam.run/news/v0.32-polishing-syntax-for-stability/
 - we can suggest to improve error message for that
-
-
+- we tested our server with `curl -X POST -d "hi" localhost:3000/echo`
+- w
 ---
 
 impossible stuff day project
@@ -46,6 +46,7 @@ The package gleeunit requires a Gleam version satisfying >= 0.33.0 but you are u
 - by poking around in the code, I see there are commits that fix glisten warnings and probably also mist ones
 - still have to understand where run_service has disappeared
 - ok disappeared in 0.13.0, last seen in 0.12.0
+- we are going with wisp
 
 ### 1.4 let's try to copy and paste more recent usage code from mist
 
