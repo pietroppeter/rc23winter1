@@ -1,0 +1,1 @@
+- need to access html with `python -m http.server` or it will complain on fetch not available
