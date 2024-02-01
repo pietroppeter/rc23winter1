@@ -1,1 +1,4 @@
+- p5hi uses basic ffi
+- rest uses proceso https://github.com/nickmcintyre/proceso
 - need to access html with `python -m http.server` or it will complain on fetch not available
+- problem with ease_in_out_circ...
