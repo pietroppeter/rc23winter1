@@ -1,4 +1,9 @@
 - p5hi uses basic ffi
 - rest uses proceso https://github.com/nickmcintyre/proceso
 - need to access html with `python -m http.server` or it will complain on fetch not available
-- problem with ease_in_out_circ...
+- conversion of okazz240103a:
+  - start from proceso active sketch
+  - de-javascriptify (replace tabs, remove braces, add colons, this. to self. ...)
+  - add p5 in front of almost everything
+  - change stuff from pascalCase to snake_case
+  - use random.choice and math
