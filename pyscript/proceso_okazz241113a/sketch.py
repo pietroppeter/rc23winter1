@@ -26,13 +26,6 @@ def draw():
     for o in objs:
         o.run()
 
-def ease_in_out_circ(x):
-    if x < 0.5:
-        return (1 - math.sqrt(1 - math.pow(2 * x, 2))) / 2
-    else:
-        return (math.sqrt(1 - math.pow(-2 * x + 2, 2)) + 1) / 2
-
-
 class Obj:
      
     def __init__(self, x, y, w):
@@ -84,94 +77,101 @@ class Obj:
 
 p5.run_sketch(setup=setup, draw=draw)
 
+def ease_in_out_circ(n):
+    n *= 2
+    if (n < 1):
+        return -0.5 * (math.sqrt(1 - n * n) - 1);
+    n2 = n - 2
+    return 0.5 * (math.sqrt(1 - (n2) * n) + 1);
+
 # original code from: https://openprocessing.org/sketch/2135904
 """
 let objs = [];
 let colors = ['#084b83', '#42bfdd', '#ff7700', '#ed254e', '#f9dc5c', '#5b1865','#5688c7'];
 
 function setup() {
-    createCanvas(900, 900);
-    rectMode(CENTER);
-    let side = width*0.8;
-    let c = 12;
-    let w = side / c;
-    for (let i = 0; i < c; i++) {
-        for (let j = 0; j < c; j++) {
-            let x = i * w + (w / 2) + (width - side)/2;
-            let y = j * w + (w / 2) + (width - side)/2;
-            objs.push(new OBJ(x, y, w * 0.5));
-        }
-    }
+	createCanvas(900, 900);
+	rectMode(CENTER);
+	let side = width*0.8;
+	let c = 12;
+	let w = side / c;
+	for (let i = 0; i < c; i++) {
+		for (let j = 0; j < c; j++) {
+			let x = i * w + (w / 2) + (width - side)/2;
+			let y = j * w + (w / 2) + (width - side)/2;
+			objs.push(new OBJ(x, y, w * 0.5));
+		}
+	}
 }
 
 function draw() {
-    background(255);
-    for (let i of objs) {
-        i.run();
-    }
+	background(255);
+	for (let i of objs) {
+		i.run();
+	}
 }
 
 function easeInOutCirc(x) {
-    return x < 0.5
-        ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
-        : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
+	return x < 0.5
+		? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
+		: (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
 }
 
 class OBJ {
-    constructor(x, y, w) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.cw = this.w;
-        this.init();
-        this.t = -dist(width/2, height/2, this.x, this.y)/10;
-        this.t0 = -20;
-        this.t1 = 80;
-        this.t2 = this.t1 + 20;
-        this.t3 = this.t2 + 80;
-    }
+	constructor(x, y, w) {
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.cw = this.w;
+		this.init();
+		this.t = -dist(width/2, height/2, this.x, this.y)/10;
+		this.t0 = -20;
+		this.t1 = 80;
+		this.t2 = this.t1 + 20;
+		this.t3 = this.t2 + 80;
+	}
 
-    show() {
-        let ww = this.w - this.cw;
-        push();
-        translate(this.x, this.y);
-        noStroke();
-        fill(this.col1);
-        circle(ww / 2, -ww / 2, this.w * 0.75);
-        fill(this.col2);
-        circle(-ww / 2, ww / 2, this.w * 0.75);
-        fill('#ffffff');
-        circle(0, 0, this.cw+1);
-        pop();
-    }
+	show() {
+		let ww = this.w - this.cw;
+		push();
+		translate(this.x, this.y);
+		noStroke();
+		fill(this.col1);
+		circle(ww / 2, -ww / 2, this.w * 0.75);
+		fill(this.col2);
+		circle(-ww / 2, ww / 2, this.w * 0.75);
+		fill('#ffffff');
+		circle(0, 0, this.cw+1);
+		pop();
+	}
 
-    move() {
-        if (0 < this.t && this.t < this.t1) {
-            let n = norm(this.t, 0, this.t1 - 1);
-            this.cw = lerp(this.w, 0, easeInOutCirc(n));
-        }
-        else if (this.t2 < this.t && this.t < this.t3) {
-            let n = norm(this.t, this.t2, this.t3 - 1);
-            this.cw = lerp(0, this.w, easeInOutCirc(n));
-        }
-        if (this.t > this.t3) {
-            this.init();
-        }
-        this.t++;
-    }
+	move() {
+		if (0 < this.t && this.t < this.t1) {
+			let n = norm(this.t, 0, this.t1 - 1);
+			this.cw = lerp(this.w, 0, easeInOutCirc(n));
+		}
+		else if (this.t2 < this.t && this.t < this.t3) {
+			let n = norm(this.t, this.t2, this.t3 - 1);
+			this.cw = lerp(0, this.w, easeInOutCirc(n));
+		}
+		if (this.t > this.t3) {
+			this.init();
+		}
+		this.t++;
+	}
 
-    init(){
-        this.col1 = this.col2 = '🐲'
-        while (this.col1 == this.col2) {
-            this.col1 = random(colors);
-            this.col2 = random(colors);
-        }
-        this.t = this.t0;
-    }
+	init(){
+		this.col1 = this.col2 = '🐲'
+		while (this.col1 == this.col2) {
+			this.col1 = random(colors);
+			this.col2 = random(colors);
+		}
+		this.t = this.t0;
+	}
 
-    run() {
-        this.show();
-        this.move();
-    }
+	run() {
+		this.show();
+		this.move();
+	}
 }
 """
